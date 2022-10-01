@@ -40,8 +40,10 @@ def toggle_ac(sensibo_client, device_name):
 
 def lambda_handler(event, context):
     try:
-        client = SensiboClientAPI(event['api_key'])
-        toggle_ac(client, event['device_name'])
+        event_data = event['queryStringParameters']
+        client = SensiboClientAPI(event_data['api_key'])
+        toggle_ac(client, event_data['device_name'])
         return {'statusCode': 200, 'body': 'OK'}
     except Exception as e:
-        return {'statusCode': 500, 'body': json.dumps({'error': str(e)})}
+        return {'statusCode': 500, 'body': json.dumps(str(e))}
+
