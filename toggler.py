@@ -1,6 +1,5 @@
 import requests
 import json
-from secrets import API_KEY, TARGET_SENSIBO_NAME
 
 _SERVER = 'https://home.sensibo.com/api/v2'
 
@@ -33,11 +32,16 @@ class SensiboClientAPI(object):
         self._patch("/pods/%s/acStates/%s" % (podUid, propertyToChange),
                 json.dumps({'currentAcState': currentAcState, 'newValue': newValue}))
 
-def toggle_ac(sensibo_client):
-    device_uid = client.devices()[TARGET_SENSIBO_NAME]
-    ac_state = client.pod_ac_state(device_uid)
-    client.pod_change_ac_state(device_uid, ac_state, "on", not ac_state['on'])
 
-if __name__ == "__main__":
-    client = SensiboClientAPI(API_KEY)
-    toggle_ac(client)
+def toggle_ac(sensibo_client, device_name):
+    device_uid = sensibo_client.devices()[device_name]
+    ac_state = sensibo_client.pod_ac_state(device_uid)
+    sensibo_client.pod_change_ac_state(device_uid, ac_state, "on", not ac_state['on'])
+
+def lambda_handler(event, context):
+    try:
+        client = SensiboClientAPI(event['api_key'])
+        toggle_ac(client, event['device_name'])
+        return {'statusCode': 200, 'body': 'OK'}
+    except Exception as e:
+        return {'statusCode': 500, 'body': json.dumps({'error': str(e)})}
