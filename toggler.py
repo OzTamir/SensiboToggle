@@ -1,5 +1,6 @@
 import requests
 import json
+from secrets import API_KEY, TARGET_SENSIBO_NAME
 
 _SERVER = 'https://home.sensibo.com/api/v2'
 
@@ -33,13 +34,10 @@ class SensiboClientAPI(object):
                 json.dumps({'currentAcState': currentAcState, 'newValue': newValue}))
 
 def toggle_ac(sensibo_client):
-    device_uid = client.devices()[device_name]
+    device_uid = client.devices()[TARGET_SENSIBO_NAME]
     ac_state = client.pod_ac_state(device_uid)
     client.pod_change_ac_state(device_uid, ac_state, "on", not ac_state['on'])
 
 if __name__ == "__main__":
-    api_key = 'API_KEY'
-    device_name = 'SENSIBO_DEVICE_NAME'
-
-    client = SensiboClientAPI(api_key)
+    client = SensiboClientAPI(API_KEY)
     toggle_ac(client)
